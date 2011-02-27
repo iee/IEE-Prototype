@@ -53,6 +53,7 @@ import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.bitbucket.gashmish.fem.editor.contained.ContainedControl;
 import org.bitbucket.gashmish.fem.editor.containing.ColorManager;
 import org.bitbucket.gashmish.fem.editor.containing.ControlManager;
 import org.bitbucket.gashmish.fem.editor.ContainingStyledText;

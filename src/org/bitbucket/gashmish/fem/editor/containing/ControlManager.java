@@ -57,6 +57,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.bitbucket.gashmish.fem.editor.contained.ContainedControl;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.ui.actions.IJavaEditorActionDefinitionIds;
