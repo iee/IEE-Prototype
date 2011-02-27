@@ -97,21 +97,7 @@ import org.eclipse.text.undo.IDocumentUndoListener;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
-import org.openquark.cal.eclipse.embedded.EmbeddedCALPlugin;
-import org.openquark.cal.eclipse.embedded.analyzer.CodeAnalyzer;
-import org.openquark.cal.eclipse.embedded.analyzer.InternalCodeAnalyzer;
-import org.openquark.cal.eclipse.embedded.contained.CALExpressionEditorManager;
-import org.openquark.cal.eclipse.embedded.contained.CALExpressionEditorProperties;
-import org.openquark.cal.eclipse.embedded.contained.CALModuleEditorManager;
-import org.openquark.cal.eclipse.embedded.contained.ContainedEditorManager;
-import org.openquark.cal.eclipse.embedded.contained.ContainedEditorProperties;
-import org.openquark.cal.eclipse.embedded.contained.EditorManagerFactory;
-import org.openquark.cal.eclipse.embedded.contained.IContainedEditorListener;
-import org.openquark.cal.eclipse.embedded.containing.ContainingEditor;
-import org.openquark.cal.eclipse.embedded.containing.ContainingEditorScanner;
-import org.openquark.cal.eclipse.embedded.containing.EmbeddedAnnotation;
-import org.openquark.cal.eclipse.embedded.containing.SwitchableAction;
-import org.openquark.cal.eclipse.embedded.exported.IEmbeddedCalConstants;
+
 
 public class ControlManager implements /* IPainter,*/ ITextPresentationListener /*, IContainedEditorListener*/ {
 
@@ -229,9 +215,16 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
     private final StyledText fStyledText;
     private IPaintPositionManager fPaintPositionManager;
     private Map<ContainedControl, Position> fContainedControlPositionMap = new HashMap<ContainedControl, Position>();
-    
     private ContainedControl fActiveContainedControl = null; 
+        
+    public ContainedControl getActiveContainedControl() {
+        return fActiveContainedControl;
+    }
     
+    public ContainingEditor getContainingEditor() {
+        return fContainingEditor;
+    }
+        
     /**
      * Creates a new Control manager for the given containing editor
      * @param embeddedEditor
@@ -268,7 +261,6 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
         }
     }
 
-
     /**
      * Extended so that we use our own position manager, not the one that
      * is passed in.
@@ -278,7 +270,6 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
         fPaintPositionManager = new ControlPositionManager(fDoc);
         fContainingEditor.getPaintManager().inputDocumentChanged(null, fDoc);
     }
-
     
     /**
      * this is the workhorse method that goes through the entire document and generates 
@@ -315,6 +306,7 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
         return controlCreated;
     }
 
+    
     /**
      * Maps a position from the model; (complete) document to the projected document
      * that may have some folded elements
@@ -390,9 +382,9 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
         if (reason != TEXT_CHANGE && reason != ContainingEditor.EMBEDDED_REPAINT) {
             return;
         }
-        List<ContainedEditorManager> toRemove = new LinkedList<ContainedEditorManager>();
+        List<ContainedControl> toRemove = new LinkedList<ContainedControl>();
 
-        for (final ContainedEditorManager c : fContainedControlPositionMap.keySet()) {
+        for (final ContainedControl c : fContainedControlPositionMap.keySet()) {
             Position model = fContainedControlPositionMap.get(c);
             if (!model.isDeleted()) {
                 // map from the model to the actual display (takes into account folding)
@@ -403,12 +395,12 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
                 } else {
                     try {
                         Point location = fStyledText.getLocationAtOffset(projected.offset);
-                        location.x += ContainingEditor.MARGIN;
-                        location.y += ContainingEditor.MARGIN;
+                        location.x += MARGIN;
+                        location.y += MARGIN;
                         c.getControl().setVisible(true);
                         c.getControl().setLocation(location);
                     } catch (IllegalArgumentException e) {
-                        EmbeddedCALPlugin.logError("Error repainting", e);
+                        //...
                     }
                 }
             } else {
@@ -440,7 +432,7 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
      * 
      * @return the position of the removed control
      */
-    private Position removeControl(ContainedEditorManager c, boolean doRemove) {
+    private Position removeControl(ContainedControl c, boolean doRemove) {
         Position p; 
         if (doRemove) {
             p = fContainedControlPositionMap.remove(c);
@@ -448,7 +440,7 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
             p = fContainedControlPositionMap.get(c);
         }
         try {
-            paintPositionManager.unmanagePosition(p);           
+            fPaintPositionManager.unmanagePosition(p);           
             
             if (doRemove && !p.isDeleted()) {
                 fStyledText.replaceStyleRanges(p.offset, p.length, new StyleRange[0]);
@@ -466,22 +458,8 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
     /*
      * Adds a control at the given position
      */
-    private ContainedEditorManager addControl(int offset, int length) {
-        // create the control propoerties
-        ContainedEditorProperties props;
-        try {
-            // get the contents by reading from the editor at the given position
-            ASTNode editorExpression = ContainedEditorProperties.toASTNode(fDoc.get(offset, length));
-            props = EditorManagerFactory.createProperties(
-                    editorExpression);
-        } catch (BadLocationException e) {
-            // something about the contents was bad, create an empty editor instead
-            EmbeddedCALPlugin.logError("Error trying to create ContainedEditorProperties: offset: " + 
-                    offset + " length: " + length, e);
-            props = new CALExpressionEditorProperties();
-        }
-
-        ContainedEditorManager contained = 
+    private ContainedControl addControl(int offset, int length) {
+    	ContainedControl containedControl = 
             EditorManagerFactory.createManager(props);
         
         if (contained.editorKind() ==  CALModuleEditorManager.EDITOR_KIND) {
@@ -1068,12 +1046,4 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
         fContainingEditor.getSourceViewer().getTextWidget().forceFocus();
     }
 
-
-    public ContainedControl getActiveContainedControl() {
-        return fActiveContainedControl;
-    }
-    
-    public ContainingEditor getContainingEditor() {
-        return fContainingEditor;
-    }
 }

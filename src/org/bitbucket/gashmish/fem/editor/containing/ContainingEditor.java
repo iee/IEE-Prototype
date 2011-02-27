@@ -59,8 +59,10 @@ import org.bitbucket.gashmish.fem.editor.ContainingStyledText;
  
 @SuppressWarnings("restriction")
 public class ContainingEditor extends CompilationUnitEditor {
-	   
-    /**
+	
+	static final int EMBEDDED_REPAINT = 32;
+    
+	/**
      * The same as CompilationUnitEditor.AdaptedSourceViewer,
      * Only need this class because we want to add some functionality to the course viewer,
      * but CompilationUnitEditor.AdaptedSourceViewer is package protected
@@ -167,8 +169,6 @@ public class ContainingEditor extends CompilationUnitEditor {
     private PaintManager fPaintManager;
     
     private boolean fInternalDirty = false;
-    private boolean fIsTextConfigured = false;
-
     
     /* Get Methods */  
     
@@ -189,7 +189,6 @@ public class ContainingEditor extends CompilationUnitEditor {
 	@Override
 	public void createPartControl(Composite parent) {
         super.createPartControl(parent);
-        fControlManager.initializeAnnotationModel();
         fControlManager.generateControls();
 	}
         
@@ -202,7 +201,7 @@ public class ContainingEditor extends CompilationUnitEditor {
     		Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler,
     		boolean isOverviewRulerVisible, int styles, IPreferenceStore store) {
         
-        ISourceViewer viewer = new ContainingSourceViewer(
+    	JavaSourceViewer viewer = new ContainingSourceViewer(
         	parent, verticalRuler, overviewRuler, isOverviewRulerVisible, styles, store);
 
         fDoc = this.getDocumentProvider().getDocument(this.getEditorInput());
@@ -306,7 +305,7 @@ public class ContainingEditor extends CompilationUnitEditor {
             }
         });
         
-        // set up the paint listener
+      /*  // set up the paint listener
         try {
             Method fPaintManager;
             fPaintManager = TextViewer.class.getDeclaredMethod("getPaintManager");
@@ -315,7 +314,16 @@ public class ContainingEditor extends CompilationUnitEditor {
             fPaintManager.addPainter(fControlManager);
         } catch (SecurityException e) {
         	//...
-        }
+	    } catch (IllegalArgumentException e) {
+	 
+	    } catch (IllegalAccessException e) {
+	      
+	    } catch (NoSuchMethodException e) {
+	       
+	    } catch (InvocationTargetException e) {
+	      
+	    }
+	    */
                 
         // ensures that we have variable height
         fStyledText.setLineSpacing(fStyledText.getLineSpacing());
@@ -332,9 +340,9 @@ public class ContainingEditor extends CompilationUnitEditor {
     @Override
     public Object getAdapter(Class required) {
         if (ITextOperationTarget.class.equals(required)) {
-            ContainedEditorManager editor = fControlManager.getCurrentlyActiveEditor();
-            if (editor != null) {
-                return editor.getAdapter(required);
+            ContainedControl containedControl = fControlManager.getActiveContainedControl();
+            if (containedControl != null) {
+                return containedControl.getAdapter(required);
             }
         }        
         return super.getAdapter(required);
@@ -366,10 +374,10 @@ public class ContainingEditor extends CompilationUnitEditor {
         }
     }
     
-    public void focusOnContainedEditor(ContainedEditorManager editor) {
-        if (editor != null) {
-            editor.setFocus();
-            fControlManager.revealSelection(editor, editor.getSelection().offset);
+    public void focusOnContainedEditor(ContainedControl containedControl) {
+        if (containedControl != null) {
+        	containedControl.setFocus();
+            fControlManager.revealSelection(containedControl, containedControl.getSelection().offset);
         }
     }
     
@@ -380,8 +388,8 @@ public class ContainingEditor extends CompilationUnitEditor {
      * @param length
      */
     private void focusOnContainedEditor(int offset, int length) {
-        //ContainedEditorManager editor = controlManager.findEditor(offset, length, false);
-        //focusOnContainedEditor(editor);
+    	ContainedControl containedControl = fControlManager.findEditor(offset, length, false);
+        focusOnContainedEditor(containedControl);
     }
-    
+  
 }
