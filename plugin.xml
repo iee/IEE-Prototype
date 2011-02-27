@@ -11,6 +11,20 @@
             name="Containing">
       </editor>
    </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="org.bitbucket.gashmish.fem.editor.containing.insertimage"
+            targetID="#CompilationUnitEditorContext">
+         <action
+               class="org.bitbucket.gashmish.fem.editor.handlers.InsertImageActionDelegate"
+               id="org.bitbucket.gashmish.fem.editor.containing.insertimage.action"
+               label="Insert image"
+               menubarPath="additions"
+               tooltip="Insert any image">
+         </action>
+      </viewerContribution>
+   </extension>
 
 
 </plugin>
