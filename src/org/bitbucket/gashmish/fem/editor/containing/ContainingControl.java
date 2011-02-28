@@ -54,6 +54,8 @@ public class ContainingControl extends CompilationUnitEditor {
 
 	private static final boolean CODE_ASSIST_DEBUG = "true".equalsIgnoreCase(Platform.getDebugOption("org.eclipse.jdt.ui/debug/ResultCollector")); //$NON-NLS-1$//$NON-NLS-2$
 
+	static final int EMBEDDED_REPAINT = 32;
+	
 	class ContainingAdaptedSourceViewer extends JavaSourceViewer {
 
 		public ContainingAdaptedSourceViewer(Composite parent,
@@ -159,11 +161,13 @@ public class ContainingControl extends CompilationUnitEditor {
 
 	}
 
+	private PaintManager paintManager;
     private IDocument doc;
 	final static int MARGIN = 2; // margin is 0, but we can bump this up if we
 	// want
 	ColorManager colorManager = new ColorManager();
 	private ControlManager controlManager;
+	private boolean internalDirty = false;
 
 	public ContainingControl() {
 		// TODO Auto-generated constructor stub
@@ -319,7 +323,28 @@ public class ContainingControl extends CompilationUnitEditor {
 		return viewer;
 	}
 
+    PaintManager getPaintManager() {
+        return paintManager;
+    }
+    
 	public ControlManager getControlManager() {
 		return controlManager;
 	}
+	
+    public ContainingSourceViewer getContainingViewer() {
+        return (ContainingSourceViewer) super.getViewer();
+    }
+    
+    /**
+     * extended to ensure that a change to a contained editor will dirty
+     * the containing editor
+     */
+    public void setDirty() {
+        boolean fireChange = !internalDirty;
+        internalDirty = true;
+
+        if (fireChange) {
+            firePropertyChange(PROP_DIRTY);
+        }
+    }
 }

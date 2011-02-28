@@ -4,12 +4,16 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.text.ITextOperationTarget;
+import org.eclipse.jface.text.Position;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -22,7 +26,9 @@ public class ContainedControl implements IAdaptable {
 	private ControlImage viewer;
 	protected Composite control;
 	Image image;
-
+	private List<IContainedControlListener> listeners;
+	protected StyledText styledText;
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
@@ -62,7 +68,14 @@ public class ContainedControl implements IAdaptable {
 			}
 		}
 	}
-
+    
+    public void addListener(IContainedControlListener listener) {
+        if (listeners == null) {
+            listeners = new LinkedList<IContainedControlListener>();
+        }
+        listeners.add(listener);
+    }
+    
 	private void disposeImage() {
 		if (image == null)
 			return;
@@ -72,5 +85,14 @@ public class ContainedControl implements IAdaptable {
 	
     public Composite getControl() {
         return control;
+    }
+
+	public void setLocation(Point location) {
+		// TODO Auto-generated method stub
+	}
+	
+    public Position getSelection() {
+        Point sel = styledText.getSelectionRange();
+        return new Position(sel.x, sel.y);
     }
 }
