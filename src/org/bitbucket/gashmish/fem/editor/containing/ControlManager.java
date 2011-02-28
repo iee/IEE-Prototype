@@ -99,6 +99,8 @@ import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 
+import org.bitbucket.gashmish.fem.editor.containing.ContainingControlScanner;
+
 
 public class ControlManager implements /* IPainter,*/ ITextPresentationListener /*, IContainedEditorListener*/ {
 
@@ -210,7 +212,7 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
      */
     private final static Font TINY_FONT = new Font(Display.getDefault(), new FontData("Times", 1, 0));
 
-    private final ContainedControlScanner fScanner = new ContainedControlScanner();
+    private final ContainingControlScanner fScanner = new ContainingControlScanner();
     private final ContainingEditor fContainingEditor;
     private final IDocument fDoc;
     private final StyledText fStyledText;
@@ -247,12 +249,12 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
     public void installPartitioner(ISourceViewer viewer) { 
         FastPartitioner partitioner = new FastPartitioner(
         		fScanner,
-        		new String[] { ContainedControlScanner.CONTAINED_EDITOR } );
+        		new String[] { ContainingControlScanner.CONTAINED_EDITOR } );
         
         partitioner.connect(fDoc);
 
         IDocumentExtension3 documentExtension = (IDocumentExtension3) fDoc;
-        documentExtension.setDocumentPartitioner(ContainedControlScanner.CONTAINED_EDITOR, partitioner);
+        documentExtension.setDocumentPartitioner(ContainingControlScanner.CONTAINED_EDITOR, partitioner);
         	
         if (viewer instanceof ITextViewerExtension4) {
         	ITextViewerExtension4 extension = (ITextViewerExtension4) viewer;
@@ -291,7 +293,7 @@ public class ControlManager implements /* IPainter,*/ ITextPresentationListener 
         // add them to the StyledText
         IToken tok;
         while (! ( tok = fScanner.nextToken() ).isEOF()) {
-            if (tok == ContainedControlScanner.EDITOR_TOKEN) {
+            if (tok == ContainingControlScanner.EDITOR_TOKEN) {
                 StyleRange[] ranges = createAndAddControl(
                         fScanner.getTokenOffset(), fScanner.getTokenLength());
                 TextPresentation singlePres = new TextPresentation();

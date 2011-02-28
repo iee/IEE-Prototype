@@ -44,7 +44,7 @@ import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.rules.Token;
 
-public class ContainingEditorScanner 
+public class ContainingControlScanner 
         extends RuleBasedPartitionScanner {
 
     public final static String CONTAINED_EDITOR = "__contained_editor";  // serves as the partition name
@@ -57,7 +57,7 @@ public class ContainingEditorScanner
      * the opening of an embedded region looks like this: /*<--*/  /**
      * The closing of an embedded region looks like this: /*-->*/  /**
      */
-    public ContainingEditorScanner() {
+    public ContainingControlScanner() {
 
         IPredicateRule[] rules = new IPredicateRule[1];
         rules[0] = new MultiLineRule("/*", "*/", EDITOR_TOKEN, '\\', true);
