@@ -952,7 +952,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 	 * @param scrollTo
 	 *            text offset in the embedded editor that should be revealed
 	 */
-	public void revealSelection(ContainedConstrol editor, int scrollTo) {
+	public void revealSelection(ContainedControl editor, int scrollTo) {
 		StyledText containedStyledText = (StyledText) editor
 				.getAdapter(StyledText.class);
 
@@ -983,7 +983,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		paint(ContainingEditor.EMBEDDED_REPAINT);
 	}
 
-	public void editorDeleted(ContainedConstrol editor,
+	public void editorDeleted(ContainedControl editor,
 			ContainedControlProperties props) {
 
 		IEditorStatusLine statusLine = (IEditorStatusLine) fContainingEditor
@@ -1004,7 +1004,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		if (editor == moduleEditor) {
 			// look for new module editor, or else it becomes null.
 			replaceModuleEditor(null);
-			for (final ContainedConstrol contained : fContainedControlPositionMap
+			for (final ContainedControl contained : fContainedControlPositionMap
 					.keySet()) {
 				if (contained.editorKind() == CALModuleEditorManager.EDITOR_KIND) {
 					replaceModuleEditor((CALModuleEditorManager) contained);
@@ -1021,7 +1021,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		editor.removeListener(this);
 	}
 
-	public void editorFocusGained(ContainedConstrol editor,
+	public void editorFocusGained(ContainedControl editor,
 			ContainedControlProperties props) {
 		Position p = fContainedControlPositionMap.get(editor);
 		currentlyActiveEditor = editor;
