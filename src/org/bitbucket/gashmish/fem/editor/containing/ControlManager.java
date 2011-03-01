@@ -941,8 +941,6 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 			revealSelection(editor, editor.getSelection().offset);
 		}
 
-		// update the gutter annotation
-		editorAnnotationMap.get(editor).setText(editor.getCalContents());
 	}
 
 	/**
@@ -980,7 +978,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 			fStyledText.setHorizontalPixel(fStyledText.getHorizontalPixel()
 					+ containingLoc.x);
 		}
-		paint(ContainingEditor.EMBEDDED_REPAINT);
+		paint(ContainingControl.EMBEDDED_REPAINT);
 	}
 
 	public void editorDeleted(ContainedControl editor,
@@ -1001,22 +999,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 				// shouldn't happen anyway
 			}
 		}
-		if (editor == moduleEditor) {
-			// look for new module editor, or else it becomes null.
-			replaceModuleEditor(null);
-			for (final ContainedControl contained : fContainedControlPositionMap
-					.keySet()) {
-				if (contained.editorKind() == CALModuleEditorManager.EDITOR_KIND) {
-					replaceModuleEditor((CALModuleEditorManager) contained);
-					break;
-				}
-			}
-		}
-
-		// remove this control's annotation
-		EmbeddedAnnotation annotation = editorAnnotationMap.remove(editor);
-		annotationModel.removeAnnotation(annotation);
-
+		
 		// remove listener
 		editor.removeListener(this);
 	}
@@ -1029,8 +1012,8 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 			fContainingEditor.getContainingViewer().setSelectedRange(p.offset,
 					p.length);
 		}
-		fContainingEditor.updateSelectionDependentActions();
-		fContainingEditor.updateStateDependentActions();
+		//fContainingEditor.updateSelectionDependentActions();
+		//fContainingEditor.updateStateDependentActions();
 	}
 
 	public void editorFocusLost(ContainedControl editor,
@@ -1041,18 +1024,17 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		if (props.isDirty()) {
 			updateSerialization(editor, props);
 			// ensure that all line heights are redrawn to their correct size
-			fContainingEditor.internalGetSourceViewer()
-					.invalidateTextPresentation();
+			//fContainingEditor.internalGetSourceViewer().invalidateTextPresentation();
 		}
 
 		// ensure that the actions are reset to correspond to the
 		// ContainingEditor, not the ContainedEditor
-		fContainingEditor.updateSelectionDependentActions();
-		fContainingEditor.updateStateDependentActions();
-		editorAnnotationMap.get(editor).setText(editor.getCalContents());
+		//fContainingEditor.updateSelectionDependentActions();
+		//fContainingEditor.updateStateDependentActions();
+		
 	}
 
-	public void exitingEditor(ContainedControl containedControl,
+	public void exitingEditor(ContainedControl editor,
 			ContainedControlProperties props, ExitDirection dir) {
 
 		Position controlPosition = fContainedControlPositionMap.get(editor);
@@ -1074,7 +1056,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		}
 		// implicitly triggers a focus lost event on the contained editor
 		// fContainingEditor.internalGetSourceViewer().getTextWidget().forceFocus();
-		fContainingEditor.getSourceViewer().getTextWidget().forceFocus();
+		//fContainingEditor.getSourceViewer().getTextWidget().forceFocus();
 	}
 	
     public ContainedControl getCurrentlyActiveEditor() {
@@ -1087,19 +1069,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 
 	}
 
-	@Override
-	public void editorDeleted(ContainedControl editor,
-			ContainedControlProperties props) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void editorFocusGained(ContainedControl editor,
-			ContainedControlProperties props) {
-		// TODO Auto-generated method stub
-
-	}
+	
 
 
 }

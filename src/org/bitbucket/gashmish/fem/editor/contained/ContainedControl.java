@@ -95,4 +95,15 @@ public class ContainedControl implements IAdaptable {
         Point sel = styledText.getSelectionRange();
         return new Position(sel.x, sel.y);
     }
+    
+    public boolean setFocus() {
+        return control.setFocus();
+    }
+    
+    public void removeListener(IContainedControlListener listener) {
+        if (listeners != null) {
+            listeners.remove(listener);
+        }
+    }
+    
 }

@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bitbucket.gashmish.fem.editor.contained.ContainedControl;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -164,6 +165,7 @@ public class ContainingControl extends CompilationUnitEditor {
 	private PaintManager paintManager;
     private IDocument doc;
 	final static int MARGIN = 2; // margin is 0, but we can bump this up if we
+	private StyledText styledText;
 	// want
 	ColorManager colorManager = new ColorManager();
 	private ControlManager controlManager;
@@ -257,13 +259,24 @@ public class ContainingControl extends CompilationUnitEditor {
 		ContainingEditorConfiguration config = (ContainingEditorConfiguration) createJavaSourceViewerConfiguration();
 		setSourceViewerConfiguration(config);
 
-		ISourceViewer viewer = new ContainingSourceViewer(parent,
+		JavaSourceViewer viewer = new ContainingSourceViewer(parent,
 				verticalRuler, overviewRuler, isOverviewRulerVisible, styles,
 				store);
 
 		// set up assorted fields
 		doc = this.getDocumentProvider().getDocument(this.getEditorInput());
+		styledText = viewer.getTextWidget();
 
+        // ensure that text can't be typed in the embedded editor
+        styledText.addVerifyListener(new VerifyListener() {
+            public void verifyText(VerifyEvent e) {
+                if (controlManager.isPositionBehindEditor(e.start, e.end-e.start)) {
+                    // actually, should bring up a dialog box that
+                    // will ask if should be deleted
+                    e.doit = false;
+                }
+            }
+        });
 		// Whenever selection is completely behind an embedded editor,
 		// give focus to the editor
 		final ISelectionProvider provider = viewer.getSelectionProvider();
@@ -277,7 +290,35 @@ public class ContainingControl extends CompilationUnitEditor {
 			}
 		};
 		provider.addSelectionChangedListener(focusOnEmbeddedListener);
-
+		
+		// This listener does two things
+        //
+        // page up and page down must trigger refresh, 
+        // so editors are properly redrawn
+        //
+        // ensures that arrow keys can navigate into embedded editors
+        styledText.addKeyListener(new KeyListener() {
+            public void keyReleased(KeyEvent e) {
+                switch (e.keyCode) {
+                    case SWT.PAGE_UP:
+                    case SWT.PAGE_DOWN:
+                    case SWT.HOME:
+                    case SWT.END:
+                        controlManager.paint(EMBEDDED_REPAINT);
+                        break;
+                        
+                    case SWT.ARROW_UP:
+                    case SWT.ARROW_DOWN:
+                    case SWT.ARROW_LEFT:
+                    case SWT.ARROW_RIGHT:
+                        provider.removeSelectionChangedListener(focusOnEmbeddedListener);
+                        focusOnContainedEditor(getSourceViewer().getSelectedRange().x, 0);
+                        provider.addSelectionChangedListener(focusOnEmbeddedListener);
+                }
+                
+            }
+            public void keyPressed(KeyEvent e) { }
+        });
 
 		// XXX for some reason clicking on initializers in the outline view does
 		// not select anywhere in the java editor. I think this is a bug in
@@ -287,7 +328,7 @@ public class ContainingControl extends CompilationUnitEditor {
 		// time, the display will repaint properly. That's what the code below
 		// does
 
-		controlManager = new ControlManager(this, doc);
+		controlManager = new ControlManager(this, styledText, doc);
 		controlManager.installPartitioner(viewer);
 
 		// redraw the embedded editors whenever there is a repaint
@@ -333,6 +374,27 @@ public class ContainingControl extends CompilationUnitEditor {
 	
     public ContainingSourceViewer getContainingViewer() {
         return (ContainingSourceViewer) super.getViewer();
+    }
+    
+    /**
+     * brings the focus to a contained editor if the position passed in
+     * is completely enclosed by an editor
+     * @param offset
+     * @param length
+     */
+    private void focusOnContainedEditor(int offset, int length) {
+        ContainedControl editor = 
+            controlManager.findEditor(offset, length, false);
+        focusOnContainedEditor(editor);
+    }
+
+    public void focusOnContainedEditor(ContainedControl editor) {
+        if (editor != null) {
+            editor.setFocus();
+//            Position p = controlManager.getEditorPosition(editor);
+//            getViewer().revealRange(p.offset, p.length);
+            controlManager.revealSelection(editor, editor.getSelection().offset);
+        }
     }
     
     /**
