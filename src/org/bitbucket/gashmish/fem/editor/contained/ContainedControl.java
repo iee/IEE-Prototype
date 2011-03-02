@@ -24,8 +24,10 @@ import org.bitbucket.gashmish.fem.editor.contained.ControlImage;
 public class ContainedControl implements IAdaptable {
 
 	private ControlImage viewer;
+	
 	protected Composite control;
 	Image image;
+	
 	private List<IContainedControlListener> listeners;
 	protected StyledText styledText;
 	
@@ -77,9 +79,10 @@ public class ContainedControl implements IAdaptable {
     }
     
 	private void disposeImage() {
-		if (image == null)
-			return;
-		image.dispose();
+		
+		if (image == null) return;
+		
+		image.dispose();		
 		image = null;
 	}
 	
@@ -89,6 +92,7 @@ public class ContainedControl implements IAdaptable {
 
 	public void setLocation(Point location) {
 		// TODO Auto-generated method stub
+		control.setLocation(location);
 	}
 	
     public Position getSelection() {

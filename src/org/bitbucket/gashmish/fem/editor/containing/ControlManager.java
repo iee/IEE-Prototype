@@ -485,7 +485,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		ContainedControl contained = new ContainedControl();
 
 		contained.createControl(fStyledText, fContainingEditor);
-		contained.initializeControlContents(fContainingEditor, "test.jpg");
+		contained.initializeControlContents(fContainingEditor, "/media/sid/test.bmp");
 
 		// determine the location of the contained editor
 		Position projected = modelToProjected(new Position(offset, 0));
@@ -530,6 +530,8 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		int length = p.length;
 
 		Rectangle rect = c.getControl().getBounds();
+		rect.height = 100;
+		rect.width = 100;
 		int ascent = rect.height - 4;
 		int descent = 4;
 
@@ -537,17 +539,17 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 
 		// first style range covers the entire size of the contained editor
 		StyleRange first = new StyleRange();
+		first.borderColor = this.fContainingEditor.colorManager.getColor(new RGB(255, 0, 0));
 		first.start = offset;
 		first.length = Math.min(1, length);
 		first.background = this.fContainingEditor.colorManager
 				.getColor(new RGB(255, 255, 255));
-		first.metrics = new GlyphMetrics(ascent + ContainingControl.MARGIN,
-				descent + ContainingControl.MARGIN, rect.width + 2
-						* ContainingControl.MARGIN);
-
+		//first.metrics = new GlyphMetrics(ascent + ContainingControl.MARGIN,descent + ContainingControl.MARGIN, rect.width + 2*ContainingControl.MARGIN);
+		first.metrics = new GlyphMetrics(50, 50, 50);
 		// this style range is hidden. the height and width are 0
 		StyleRange second = new StyleRange();
 		second.start = offset + 1;
+		second.borderColor = this.fContainingEditor.colorManager.getColor(new RGB(255, 0, 0));
 		second.length = length - 1;
 		second.background = this.fContainingEditor.colorManager
 				.getColor(new RGB(255, 255, 255));

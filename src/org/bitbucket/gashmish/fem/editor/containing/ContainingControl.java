@@ -22,6 +22,7 @@ import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextListener;
 import org.eclipse.jface.text.IWidgetTokenKeeper;
 import org.eclipse.jface.text.PaintManager;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextViewer;
@@ -391,8 +392,8 @@ public class ContainingControl extends CompilationUnitEditor {
     public void focusOnContainedEditor(ContainedControl editor) {
         if (editor != null) {
             editor.setFocus();
-//            Position p = controlManager.getEditorPosition(editor);
-//            getViewer().revealRange(p.offset, p.length);
+            Position p = controlManager.getEditorPosition(editor);
+            getViewer().revealRange(p.offset, p.length);
             controlManager.revealSelection(editor, editor.getSelection().offset);
         }
     }
