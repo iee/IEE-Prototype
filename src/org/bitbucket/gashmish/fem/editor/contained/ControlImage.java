@@ -34,8 +34,9 @@ public class ControlImage extends Canvas {
 		});
 		addListener(SWT.MouseMove, new Listener() {
 			public void handleEvent(Event event) {
-				if (getDrawingBounds().contains(event.x, event.y))
-					showEnlargedImage();
+				if (image == null) return;
+				//if (getDrawingBounds().contains(event.x, event.y))
+				//	showEnlargedImage();
 			}
 		});
 		addListener(SWT.MouseExit, new Listener() {
@@ -71,7 +72,7 @@ public class ControlImage extends Canvas {
 		return new Rectangle(x, y, width, height);
 	}
 	
-	private void showEnlargedImage() {
+	/*private void showEnlargedImage() {
 		if (showingEnlargedImage) return;
 		if (stayClosed) return;
 		if (image == null) return;
@@ -115,7 +116,7 @@ public class ControlImage extends Canvas {
 		});
 	
 		shell.open();
-	}
+	}*/
 
 	/**
 	 * This method sets the image that the receiver is responsible for drawing.

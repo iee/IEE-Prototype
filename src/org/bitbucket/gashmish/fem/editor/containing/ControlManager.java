@@ -485,7 +485,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		ContainedControl contained = new ContainedControl();
 
 		contained.createControl(fStyledText, fContainingEditor);
-		contained.initializeControlContents(fContainingEditor, "test.jpg");
+		contained.initializeControlContents(fContainingEditor, "/media/sid/test.bmp");
 
 		// determine the location of the contained editor
 		Position projected = modelToProjected(new Position(offset, 0));
@@ -496,26 +496,6 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 
 		return contained;
 
-	}
-
-	private void replaceModuleEditor(String contained) {
-		// TODO
-		/*
-		 * if (moduleEditor != null) { CodeAnalyzer analyzer =
-		 * fContainingEditor.getAnalyzer(); // ADE I don't like this instanceof
-		 * test. Can we make CodeAnalyzer implement EditorListener? // yes we
-		 * can, but I don't have time now if (analyzer instanceof
-		 * InternalCodeAnalyzer) {
-		 * moduleEditor.removeListener((InternalCodeAnalyzer) analyzer); } }
-		 * moduleEditor = contained; fContainingEditor.createCodeAnalyzer();
-		 * 
-		 * if (moduleEditor != null) { CodeAnalyzer analyzer =
-		 * fContainingEditor.getAnalyzer(); // ADE I don't like this instanceof
-		 * test. Can we make CodeAnalyzer implement EditorListener? // yes we
-		 * can, but I don't have time now if (analyzer instanceof
-		 * InternalCodeAnalyzer) {
-		 * moduleEditor.addListener((InternalCodeAnalyzer) analyzer); } }
-		 */
 	}
 
 	/**
@@ -530,6 +510,8 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		int length = p.length;
 
 		Rectangle rect = c.getControl().getBounds();
+		rect.height = 100;
+		rect.width = 100;
 		int ascent = rect.height - 4;
 		int descent = 4;
 
@@ -537,17 +519,17 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 
 		// first style range covers the entire size of the contained editor
 		StyleRange first = new StyleRange();
+		first.borderColor = this.fContainingEditor.colorManager.getColor(new RGB(255, 0, 0));
 		first.start = offset;
 		first.length = Math.min(1, length);
 		first.background = this.fContainingEditor.colorManager
-				.getColor(new RGB(255, 255, 255));
-		first.metrics = new GlyphMetrics(ascent + ContainingControl.MARGIN,
-				descent + ContainingControl.MARGIN, rect.width + 2
-						* ContainingControl.MARGIN);
-
+				.getColor(new RGB(255, 0, 255));
+		//first.metrics = new GlyphMetrics(ascent + ContainingControl.MARGIN,descent + ContainingControl.MARGIN, rect.width + 2*ContainingControl.MARGIN);
+		first.metrics = new GlyphMetrics(100, 150, 150);
 		// this style range is hidden. the height and width are 0
 		StyleRange second = new StyleRange();
 		second.start = offset + 1;
+		second.borderColor = this.fContainingEditor.colorManager.getColor(new RGB(255, 0, 0));
 		second.length = length - 1;
 		second.background = this.fContainingEditor.colorManager
 				.getColor(new RGB(255, 255, 255));
@@ -750,9 +732,9 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 				.getDocumentProvider()).getWorkingCopy(fContainingEditor
 				.getEditorInput());
 
-		if (unit != null) {
-			props.requiresImport(unit);
-		}
+		//if (unit != null) { seems it' unuseful
+		//	props.requiresImport(unit);
+		//}
 	}
 
 	public void saveAllEditors() {
@@ -842,41 +824,37 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 //		newAction = new SwitchableAction(oldAction, this);
 //		fContainingEditor.setAction(TEXT_END, newAction);
 //
-//		oldAction = fContainingEditor
-//				.getAction(ITextEditorActionConstants.SELECT_ALL);
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction(ITextEditorActionDefinitionIds.SELECT_ALL,
-//				newAction);
-//		fContainingEditor.setAction(ITextEditorActionConstants.SELECT_ALL,
-//				newAction);
-//		fContainingEditor.markAsStateDependentAction(
-//				ITextEditorActionConstants.SELECT_ALL, true);
-//		// Text actions
-//
-//		// note- we use "paste", not PASTE since the former
-//		// is what the JavaEditor uses
-//		// the same goes for the other text operations
-//
-//		oldAction = fContainingEditor.getAction("paste");
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction("paste", newAction);
-//
-//		oldAction = fContainingEditor.getAction("copy");
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction("copy", newAction);
-//
-//		oldAction = fContainingEditor.getAction("cut");
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction("cut", newAction);
-//
+		oldAction = fContainingEditor.getAction(ITextEditorActionConstants.SELECT_ALL);
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction(ITextEditorActionDefinitionIds.SELECT_ALL,newAction);
+		fContainingEditor.setAction(ITextEditorActionConstants.SELECT_ALL,newAction);
+		fContainingEditor.markAsStateDependentAction(ITextEditorActionConstants.SELECT_ALL,true);
+		// Text actions
+
+		// note- we use "paste", not PASTE since the former
+		// is what the JavaEditor uses
+		// the same goes for the other text operations
+
+		oldAction = fContainingEditor.getAction("paste");
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction("paste", newAction);
+
+		oldAction = fContainingEditor.getAction("copy");
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction("copy", newAction);
+
+		oldAction = fContainingEditor.getAction("cut");
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction("cut", newAction);
+
 //		// hover
-//		oldAction = fContainingEditor
-//				.getAction(ITextEditorActionConstants.SHOW_INFORMATION);
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction(
-//				ITextEditorActionDefinitionIds.SHOW_INFORMATION, newAction);
-//		fContainingEditor.setAction(
-//				ITextEditorActionConstants.SHOW_INFORMATION, newAction);
+		oldAction = fContainingEditor
+				.getAction(ITextEditorActionConstants.SHOW_INFORMATION);
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction(
+				ITextEditorActionDefinitionIds.SHOW_INFORMATION, newAction);
+		fContainingEditor.setAction(
+				ITextEditorActionConstants.SHOW_INFORMATION, newAction);
 //
 //		// toggle comment
 //		oldAction = fContainingEditor.getAction("ToggleComment");
@@ -890,10 +868,10 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 //		newAction = new SwitchableAction(oldAction, this);
 //		fContainingEditor.setAction("ContentAssistProposal", newAction);
 //
-//		// open declaration
-//		oldAction = fContainingEditor.getAction("OpenEditor");
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction("OpenEditor", newAction);
+		// open declaration
+		oldAction = fContainingEditor.getAction("OpenEditor");
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction("OpenEditor", newAction);
 //
 //		// oldAction =
 //		// containingEditor.getAction(IJavaEditorActionDefinitionIds.FORMAT);
@@ -910,18 +888,14 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 	 * @return
 	 */
 	private IAction originalAction(IAction oldAction) {
-//		return oldAction instanceof SwitchableAction ? ((SwitchableAction) oldAction)
-//				.getJavaEditorAction()
-//				: oldAction;
-		return oldAction;
-	}
-
+        return oldAction instanceof SwitchableAction ? ((SwitchableAction) oldAction).getJavaEditorAction() : oldAction;
+    }
 	/**
 	 * Called whenever a contained editor is resized
 	 */
 	public void editorResized(ContainedControl editor,
 			ContainedControlProperties props) {
-		// updateSerialization(editor, props);
+		 updateSerialization(editor, props);
 	}
 
 	public void editorSaved(ContainedControl editor,
@@ -941,8 +915,6 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 			revealSelection(editor, editor.getSelection().offset);
 		}
 
-		// update the gutter annotation
-		editorAnnotationMap.get(editor).setText(editor.getCalContents());
 	}
 
 	/**
@@ -952,7 +924,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 	 * @param scrollTo
 	 *            text offset in the embedded editor that should be revealed
 	 */
-	public void revealSelection(ContainedConstrol editor, int scrollTo) {
+	public void revealSelection(ContainedControl editor, int scrollTo) {
 		StyledText containedStyledText = (StyledText) editor
 				.getAdapter(StyledText.class);
 
@@ -980,10 +952,10 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 			fStyledText.setHorizontalPixel(fStyledText.getHorizontalPixel()
 					+ containingLoc.x);
 		}
-		paint(ContainingEditor.EMBEDDED_REPAINT);
+		paint(ContainingControl.EMBEDDED_REPAINT);
 	}
 
-	public void editorDeleted(ContainedConstrol editor,
+	public void editorDeleted(ContainedControl editor,
 			ContainedControlProperties props) {
 
 		IEditorStatusLine statusLine = (IEditorStatusLine) fContainingEditor
@@ -1001,27 +973,12 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 				// shouldn't happen anyway
 			}
 		}
-		if (editor == moduleEditor) {
-			// look for new module editor, or else it becomes null.
-			replaceModuleEditor(null);
-			for (final ContainedConstrol contained : fContainedControlPositionMap
-					.keySet()) {
-				if (contained.editorKind() == CALModuleEditorManager.EDITOR_KIND) {
-					replaceModuleEditor((CALModuleEditorManager) contained);
-					break;
-				}
-			}
-		}
-
-		// remove this control's annotation
-		EmbeddedAnnotation annotation = editorAnnotationMap.remove(editor);
-		annotationModel.removeAnnotation(annotation);
-
+		
 		// remove listener
 		editor.removeListener(this);
 	}
 
-	public void editorFocusGained(ContainedConstrol editor,
+	public void editorFocusGained(ContainedControl editor,
 			ContainedControlProperties props) {
 		Position p = fContainedControlPositionMap.get(editor);
 		currentlyActiveEditor = editor;
@@ -1029,8 +986,8 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 			fContainingEditor.getContainingViewer().setSelectedRange(p.offset,
 					p.length);
 		}
-		fContainingEditor.updateSelectionDependentActions();
-		fContainingEditor.updateStateDependentActions();
+		//fContainingEditor.updateSelectionDependentActions();
+		//fContainingEditor.updateStateDependentActions();
 	}
 
 	public void editorFocusLost(ContainedControl editor,
@@ -1041,18 +998,17 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		if (props.isDirty()) {
 			updateSerialization(editor, props);
 			// ensure that all line heights are redrawn to their correct size
-			fContainingEditor.internalGetSourceViewer()
-					.invalidateTextPresentation();
+			//fContainingEditor.internalGetSourceViewer().invalidateTextPresentation();
 		}
 
 		// ensure that the actions are reset to correspond to the
 		// ContainingEditor, not the ContainedEditor
-		fContainingEditor.updateSelectionDependentActions();
-		fContainingEditor.updateStateDependentActions();
-		editorAnnotationMap.get(editor).setText(editor.getCalContents());
+		//fContainingEditor.updateSelectionDependentActions();
+		//fContainingEditor.updateStateDependentActions();
+		
 	}
 
-	public void exitingEditor(ContainedControl containedControl,
+	public void exitingEditor(ContainedControl editor,
 			ContainedControlProperties props, ExitDirection dir) {
 
 		Position controlPosition = fContainedControlPositionMap.get(editor);
@@ -1074,7 +1030,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		}
 		// implicitly triggers a focus lost event on the contained editor
 		// fContainingEditor.internalGetSourceViewer().getTextWidget().forceFocus();
-		fContainingEditor.getSourceViewer().getTextWidget().forceFocus();
+		//fContainingEditor.getSourceViewer().getTextWidget().forceFocus();
 	}
 	
     public ContainedControl getCurrentlyActiveEditor() {
@@ -1087,19 +1043,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 
 	}
 
-	@Override
-	public void editorDeleted(ContainedControl editor,
-			ContainedControlProperties props) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void editorFocusGained(ContainedControl editor,
-			ContainedControlProperties props) {
-		// TODO Auto-generated method stub
-
-	}
+	
 
 
 }

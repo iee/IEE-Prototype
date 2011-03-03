@@ -4,10 +4,13 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.Position;
 import org.eclipse.swt.SWT;
@@ -24,8 +27,16 @@ import org.bitbucket.gashmish.fem.editor.contained.ControlImage;
 public class ContainedControl implements IAdaptable {
 
 	private ControlImage viewer;
+	
 	protected Composite control;
 	Image image;
+	
+	/**
+     * maps a java editor action to the equivalent action to be used
+     * by this contained editor
+     */
+    private Map<String, IAction> actionMap = new HashMap<String, IAction>();
+    
 	private List<IContainedControlListener> listeners;
 	protected StyledText styledText;
 	
@@ -39,6 +50,10 @@ public class ContainedControl implements IAdaptable {
 		
 		return null;
 	}
+	
+	public IAction getAction(IAction javaEditorAction) {
+        return actionMap.get(javaEditorAction.getActionDefinitionId());
+    }
 
 	public void createControl(StyledText parent,
 			ContainingControl containingEditor) {
@@ -77,9 +92,10 @@ public class ContainedControl implements IAdaptable {
     }
     
 	private void disposeImage() {
-		if (image == null)
-			return;
-		image.dispose();
+		
+		if (image == null) return;
+		
+		image.dispose();		
 		image = null;
 	}
 	
@@ -89,10 +105,22 @@ public class ContainedControl implements IAdaptable {
 
 	public void setLocation(Point location) {
 		// TODO Auto-generated method stub
+		control.setLocation(location);
 	}
 	
     public Position getSelection() {
         Point sel = styledText.getSelectionRange();
         return new Position(sel.x, sel.y);
     }
+    
+    public boolean setFocus() {
+        return control.setFocus();
+    }
+    
+    public void removeListener(IContainedControlListener listener) {
+        if (listeners != null) {
+            listeners.remove(listener);
+        }
+    }
+    
 }
