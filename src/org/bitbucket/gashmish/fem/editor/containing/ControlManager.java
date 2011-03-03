@@ -752,9 +752,9 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 				.getDocumentProvider()).getWorkingCopy(fContainingEditor
 				.getEditorInput());
 
-		if (unit != null) {
-			props.requiresImport(unit);
-		}
+		//if (unit != null) { seems it' unuseful
+		//	props.requiresImport(unit);
+		//}
 	}
 
 	public void saveAllEditors() {

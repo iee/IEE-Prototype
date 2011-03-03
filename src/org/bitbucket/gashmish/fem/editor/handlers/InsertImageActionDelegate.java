@@ -22,14 +22,14 @@ import org.eclipse.ui.IEditorPart;
 
 public class InsertImageActionDelegate implements IEditorActionDelegate {
 
-	private static final String embeddedRegionMarker = "/* <-- */System.out.print(\"hell\") /* --> */";
+	private static final String embeddedRegionMarker = "/* <-- *//* --> */";
 	
 	private ContainingControl currentControl;
 	
-	//public InsertImageActionDelegate() {
+	public InsertImageActionDelegate() {
 		// TODO Auto-generated constructor stub
 		
-	//}
+	}
 
 	@Override
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {

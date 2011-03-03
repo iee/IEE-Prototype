@@ -196,14 +196,6 @@ public abstract class ContainedControlProperties {
     	return null;
     }
     
-    /**
-     * sub-classes override if they require import statements to be added
-     * @param unit
-     */
-    public void requiresImport(ICompilationUnit unit) { 
-        createImport(unit, "org.openquark.cal.eclipse.embedded.exported.RunQuark");
-    }
-
     public void setSize(Point size) {
         if (height != size.y || width != size.x) {
             height = size.y;
