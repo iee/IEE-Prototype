@@ -1,211 +1,288 @@
 package org.bitbucket.gashmish.fem.editor.containing;
 
+import org.bitbucket.gashmish.fem.editor.contained.ContainedControl;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.ITextViewerExtension5;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.texteditor.IUpdate;
+import org.eclipse.ui.texteditor.TextEditorAction;
+import org.eclipse.ui.texteditor.TextOperationAction;
 
 public class SwitchableAction implements IAction, IUpdate {
 
+	/****************************************************************/
+    /*******The following methods just delegate to the **************/
+    /*******actoin's super class*************************************/
+    /****************************************************************/
+
+    /**
+     * the action on the Java editor to use if the selection is not in a contained
+     * editor
+     */
+    private final IAction javaEditorAction;
+
+    /** used to determine the currently focused ContainedEditor */
+    private final ControlManager controlManager;
+    
+    public SwitchableAction(IAction javaEditorAction,
+            ControlManager controlManager) {
+        this.javaEditorAction = javaEditorAction;
+        this.controlManager = controlManager;
+    }
+	
 	@Override
 	public void addPropertyChangeListener(IPropertyChangeListener listener) {
-		// TODO Auto-generated method stub
-		
+	
+		getRelevantAction().addPropertyChangeListener(listener);
 	}
 
 	@Override
 	public int getAccelerator() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getRelevantAction().getAccelerator();
 	}
 
 	@Override
 	public String getActionDefinitionId() {
-		// TODO Auto-generated method stub
-		return null;
+		return getRelevantAction().getActionDefinitionId();
 	}
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		 return getRelevantAction().getDescription();
 	}
 
 	@Override
 	public ImageDescriptor getDisabledImageDescriptor() {
-		// TODO Auto-generated method stub
-		return null;
+		return getRelevantAction().getDisabledImageDescriptor();
 	}
 
 	@Override
 	public HelpListener getHelpListener() {
-		// TODO Auto-generated method stub
-		return null;
+		return getRelevantAction().getHelpListener();
 	}
 
 	@Override
 	public ImageDescriptor getHoverImageDescriptor() {
-		// TODO Auto-generated method stub
-		return null;
+		return getRelevantAction().getHoverImageDescriptor();
 	}
 
 	@Override
 	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
+		return getRelevantAction().getId();
 	}
 
 	@Override
 	public ImageDescriptor getImageDescriptor() {
-		// TODO Auto-generated method stub
-		return null;
+		return getRelevantAction().getImageDescriptor();
 	}
 
 	@Override
 	public IMenuCreator getMenuCreator() {
-		// TODO Auto-generated method stub
-		return null;
+		return getRelevantAction().getMenuCreator();
 	}
 
 	@Override
 	public int getStyle() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getRelevantAction().getStyle();
 	}
 
 	@Override
 	public String getText() {
-		// TODO Auto-generated method stub
-		return null;
+		return getRelevantAction().getText();
 	}
 
 	@Override
 	public String getToolTipText() {
-		// TODO Auto-generated method stub
-		return null;
+		return getRelevantAction().getToolTipText();
 	}
 
 	@Override
 	public boolean isChecked() {
-		// TODO Auto-generated method stub
-		return false;
+		return getRelevantAction().isChecked();
 	}
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return getRelevantAction().isEnabled();
 	}
 
 	@Override
 	public boolean isHandled() {
-		// TODO Auto-generated method stub
-		return false;
+		 return getRelevantAction().isHandled();
 	}
 
 	@Override
 	public void removePropertyChangeListener(IPropertyChangeListener listener) {
-		// TODO Auto-generated method stub
+		getRelevantAction().removePropertyChangeListener(listener);
 		
 	}
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		getRelevantAction().run();
 		
 	}
 
 	@Override
 	public void runWithEvent(Event event) {
-		// TODO Auto-generated method stub
+		getRelevantAction().runWithEvent(event);
 		
 	}
 
 	@Override
 	public void setAccelerator(int keycode) {
-		// TODO Auto-generated method stub
+		getRelevantAction().setAccelerator(keycode);
 		
 	}
 
 	@Override
 	public void setActionDefinitionId(String id) {
-		// TODO Auto-generated method stub
-		
+		getRelevantAction().setActionDefinitionId(id);
 	}
 
 	@Override
 	public void setChecked(boolean checked) {
-		// TODO Auto-generated method stub
+		getRelevantAction().setChecked(checked);
 		
 	}
 
 	@Override
 	public void setDescription(String text) {
-		// TODO Auto-generated method stub
+		 getRelevantAction().setDescription(text);
 		
 	}
 
 	@Override
 	public void setDisabledImageDescriptor(ImageDescriptor newImage) {
-		// TODO Auto-generated method stub
+		getRelevantAction().setDisabledImageDescriptor(newImage);
 		
 	}
 
 	@Override
 	public void setEnabled(boolean enabled) {
-		// TODO Auto-generated method stub
+		getRelevantAction().setEnabled(enabled);
 		
 	}
 
 	@Override
 	public void setHelpListener(HelpListener listener) {
-		// TODO Auto-generated method stub
-		
+		getRelevantAction().setHelpListener(listener);
 	}
 
 	@Override
 	public void setHoverImageDescriptor(ImageDescriptor newImage) {
-		// TODO Auto-generated method stub
+		getRelevantAction().setHoverImageDescriptor(newImage);
 		
 	}
 
 	@Override
 	public void setId(String id) {
-		// TODO Auto-generated method stub
-		
+		getRelevantAction().setId(id);
 	}
 
 	@Override
 	public void setImageDescriptor(ImageDescriptor newImage) {
-		// TODO Auto-generated method stub
+		getRelevantAction().setImageDescriptor(newImage);
 		
 	}
 
 	@Override
 	public void setMenuCreator(IMenuCreator creator) {
-		// TODO Auto-generated method stub
+		getRelevantAction().setMenuCreator(creator);
 		
 	}
 
 	@Override
 	public void setText(String text) {
-		// TODO Auto-generated method stub
+		getRelevantAction().setText(text);
 		
 	}
 
 	@Override
 	public void setToolTipText(String text) {
-		// TODO Auto-generated method stub
+		getRelevantAction().setToolTipText(text);
 		
 	}
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
+		IAction action = getRelevantAction();
+        if (action instanceof IUpdate) {
+            if (action instanceof TextOperationAction) {
+                // this sets up the TextTarget
+                ((TextOperationAction) action).setEditor(
+                        controlManager.getContainingEditor());
+            } else if (action instanceof TextEditorAction) {
+                ((TextEditorAction) action).setEditor(
+                        controlManager.getContainingEditor());
+            }
+            ((IUpdate) action).update();
+        }
 		
 	}
+	
+	public IAction getJavaEditorAction() {
+        return javaEditorAction;
+    }
+	/**
+     * chooses either the JavaAction or one of the actions on a contained editor
+     * depending on what is currently selected
+     * 
+     * @return either the Java editor action, or the contained editor action
+     */
+    private IAction getRelevantAction() {
+        ContainedControl editor = controlManager.getCurrentlyActiveEditor();
+        if (editor == null) {
+            return javaEditorAction;
+        } else {
+            IAction action = editor.getAction(javaEditorAction);
+            return action != null ? action : javaEditorAction;
+        }
+    }
+	
+    /**
+     * Utility method used by many of the actions
+     * Maps from the projected (widget) offset to the model offset.  
+     * Handles code folding.
+     * 
+     * @param viewer
+     * @param widgetOffset
+     * @return the model offset
+     */
+    protected final static int widgetOffset2ModelOffset(ISourceViewer viewer,
+            int widgetOffset) {
+        if (viewer instanceof ITextViewerExtension5) {
+            ITextViewerExtension5 extension = (ITextViewerExtension5) viewer;
+            return extension.widgetOffset2ModelOffset(widgetOffset);
+        }
+        return widgetOffset + viewer.getVisibleRegion().getOffset();
+    }
+
+    /**
+     * Returns the offset of the given source viewer's text widget that
+     * corresponds to the given model offset or <code>-1</code> if there is no
+     * such offset.
+     * 
+     * @param viewer
+     *          the source viewer
+     * @param modelOffset
+     *          the model offset
+     * @return the corresponding offset in the source viewer's text widget or
+     *         <code>-1</code>
+     * @since 3.0
+     */
+    protected final static int modelOffset2WidgetOffset(ISourceViewer viewer,
+            int modelOffset) {
+        if (viewer instanceof ITextViewerExtension5) {
+            ITextViewerExtension5 extension = (ITextViewerExtension5) viewer;
+            return extension.modelOffset2WidgetOffset(modelOffset);
+        }
+        return modelOffset - viewer.getVisibleRegion().getOffset();
+    }
 
 }

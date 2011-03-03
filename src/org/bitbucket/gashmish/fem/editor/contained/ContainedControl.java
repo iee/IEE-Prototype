@@ -4,10 +4,13 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.Position;
 import org.eclipse.swt.SWT;
@@ -28,6 +31,12 @@ public class ContainedControl implements IAdaptable {
 	protected Composite control;
 	Image image;
 	
+	/**
+     * maps a java editor action to the equivalent action to be used
+     * by this contained editor
+     */
+    private Map<String, IAction> actionMap = new HashMap<String, IAction>();
+    
 	private List<IContainedControlListener> listeners;
 	protected StyledText styledText;
 	
@@ -41,6 +50,10 @@ public class ContainedControl implements IAdaptable {
 		
 		return null;
 	}
+	
+	public IAction getAction(IAction javaEditorAction) {
+        return actionMap.get(javaEditorAction.getActionDefinitionId());
+    }
 
 	public void createControl(StyledText parent,
 			ContainingControl containingEditor) {

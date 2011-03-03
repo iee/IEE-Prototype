@@ -498,26 +498,6 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 
 	}
 
-	private void replaceModuleEditor(String contained) {
-		// TODO
-		/*
-		 * if (moduleEditor != null) { CodeAnalyzer analyzer =
-		 * fContainingEditor.getAnalyzer(); // ADE I don't like this instanceof
-		 * test. Can we make CodeAnalyzer implement EditorListener? // yes we
-		 * can, but I don't have time now if (analyzer instanceof
-		 * InternalCodeAnalyzer) {
-		 * moduleEditor.removeListener((InternalCodeAnalyzer) analyzer); } }
-		 * moduleEditor = contained; fContainingEditor.createCodeAnalyzer();
-		 * 
-		 * if (moduleEditor != null) { CodeAnalyzer analyzer =
-		 * fContainingEditor.getAnalyzer(); // ADE I don't like this instanceof
-		 * test. Can we make CodeAnalyzer implement EditorListener? // yes we
-		 * can, but I don't have time now if (analyzer instanceof
-		 * InternalCodeAnalyzer) {
-		 * moduleEditor.addListener((InternalCodeAnalyzer) analyzer); } }
-		 */
-	}
-
 	/**
 	 * creates the style range of the StyledText for the range of the contained
 	 * editor
@@ -543,9 +523,9 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		first.start = offset;
 		first.length = Math.min(1, length);
 		first.background = this.fContainingEditor.colorManager
-				.getColor(new RGB(255, 255, 255));
+				.getColor(new RGB(255, 0, 255));
 		//first.metrics = new GlyphMetrics(ascent + ContainingControl.MARGIN,descent + ContainingControl.MARGIN, rect.width + 2*ContainingControl.MARGIN);
-		first.metrics = new GlyphMetrics(50, 50, 50);
+		first.metrics = new GlyphMetrics(100, 150, 150);
 		// this style range is hidden. the height and width are 0
 		StyleRange second = new StyleRange();
 		second.start = offset + 1;
@@ -844,41 +824,37 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 //		newAction = new SwitchableAction(oldAction, this);
 //		fContainingEditor.setAction(TEXT_END, newAction);
 //
-//		oldAction = fContainingEditor
-//				.getAction(ITextEditorActionConstants.SELECT_ALL);
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction(ITextEditorActionDefinitionIds.SELECT_ALL,
-//				newAction);
-//		fContainingEditor.setAction(ITextEditorActionConstants.SELECT_ALL,
-//				newAction);
-//		fContainingEditor.markAsStateDependentAction(
-//				ITextEditorActionConstants.SELECT_ALL, true);
-//		// Text actions
-//
-//		// note- we use "paste", not PASTE since the former
-//		// is what the JavaEditor uses
-//		// the same goes for the other text operations
-//
-//		oldAction = fContainingEditor.getAction("paste");
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction("paste", newAction);
-//
-//		oldAction = fContainingEditor.getAction("copy");
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction("copy", newAction);
-//
-//		oldAction = fContainingEditor.getAction("cut");
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction("cut", newAction);
-//
+		oldAction = fContainingEditor.getAction(ITextEditorActionConstants.SELECT_ALL);
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction(ITextEditorActionDefinitionIds.SELECT_ALL,newAction);
+		fContainingEditor.setAction(ITextEditorActionConstants.SELECT_ALL,newAction);
+		fContainingEditor.markAsStateDependentAction(ITextEditorActionConstants.SELECT_ALL,true);
+		// Text actions
+
+		// note- we use "paste", not PASTE since the former
+		// is what the JavaEditor uses
+		// the same goes for the other text operations
+
+		oldAction = fContainingEditor.getAction("paste");
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction("paste", newAction);
+
+		oldAction = fContainingEditor.getAction("copy");
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction("copy", newAction);
+
+		oldAction = fContainingEditor.getAction("cut");
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction("cut", newAction);
+
 //		// hover
-//		oldAction = fContainingEditor
-//				.getAction(ITextEditorActionConstants.SHOW_INFORMATION);
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction(
-//				ITextEditorActionDefinitionIds.SHOW_INFORMATION, newAction);
-//		fContainingEditor.setAction(
-//				ITextEditorActionConstants.SHOW_INFORMATION, newAction);
+		oldAction = fContainingEditor
+				.getAction(ITextEditorActionConstants.SHOW_INFORMATION);
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction(
+				ITextEditorActionDefinitionIds.SHOW_INFORMATION, newAction);
+		fContainingEditor.setAction(
+				ITextEditorActionConstants.SHOW_INFORMATION, newAction);
 //
 //		// toggle comment
 //		oldAction = fContainingEditor.getAction("ToggleComment");
@@ -892,10 +868,10 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 //		newAction = new SwitchableAction(oldAction, this);
 //		fContainingEditor.setAction("ContentAssistProposal", newAction);
 //
-//		// open declaration
-//		oldAction = fContainingEditor.getAction("OpenEditor");
-//		newAction = new SwitchableAction(oldAction, this);
-//		fContainingEditor.setAction("OpenEditor", newAction);
+		// open declaration
+		oldAction = fContainingEditor.getAction("OpenEditor");
+		newAction = new SwitchableAction(oldAction, this);
+		fContainingEditor.setAction("OpenEditor", newAction);
 //
 //		// oldAction =
 //		// containingEditor.getAction(IJavaEditorActionDefinitionIds.FORMAT);
@@ -912,18 +888,14 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 	 * @return
 	 */
 	private IAction originalAction(IAction oldAction) {
-//		return oldAction instanceof SwitchableAction ? ((SwitchableAction) oldAction)
-//				.getJavaEditorAction()
-//				: oldAction;
-		return oldAction;
-	}
-
+        return oldAction instanceof SwitchableAction ? ((SwitchableAction) oldAction).getJavaEditorAction() : oldAction;
+    }
 	/**
 	 * Called whenever a contained editor is resized
 	 */
 	public void editorResized(ContainedControl editor,
 			ContainedControlProperties props) {
-		// updateSerialization(editor, props);
+		 updateSerialization(editor, props);
 	}
 
 	public void editorSaved(ContainedControl editor,
