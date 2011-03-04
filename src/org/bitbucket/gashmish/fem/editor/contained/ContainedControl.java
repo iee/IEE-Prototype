@@ -14,12 +14,20 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.Position;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.PaintObjectEvent;
+import org.eclipse.swt.custom.PaintObjectListener;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 import org.bitbucket.gashmish.fem.editor.containing.ContainingControl;
 import org.bitbucket.gashmish.fem.editor.contained.ControlImage;
@@ -55,8 +63,49 @@ public class ContainedControl implements IAdaptable {
         return actionMap.get(javaEditorAction.getActionDefinitionId());
     }
 
-	public void createControl(StyledText parent,
+	public void createControl(final StyledText parent,
 			ContainingControl containingEditor) {
+		// use a verify listener to dispose the images
+		parent.addVerifyListener(new VerifyListener()  {
+			public void verifyText(VerifyEvent event) {
+				if (event.start == event.end) return;
+				String text = parent.getText(event.start, event.end - 1);
+				int index = text.indexOf('\uFFFC');
+				while (index != -1) {
+					StyleRange style = parent.getStyleRangeAtOffset(event.start + index);
+					if (style != null) {
+						Image image = (Image)style.data;
+						if (image != null) image.dispose();
+					}
+					index = text.indexOf('\uFFFC', index + 1);
+				}
+			}
+		});
+		// draw images on paint event
+		parent.addPaintObjectListener(new PaintObjectListener() {
+			public void paintObject(PaintObjectEvent event) {
+				StyleRange style = event.style;
+				Image image = (Image)style.data;
+				if (!image.isDisposed()) {
+					int x = event.x;
+					int y = event.y + event.ascent - style.metrics.ascent;						
+					event.gc.drawImage(image, x, y);
+				}
+			}
+		});
+		parent.addListener(SWT.Dispose, new Listener() {
+			public void handleEvent(Event event) {
+				StyleRange[] styles = parent.getStyleRanges();
+				for (int i = 0; i < styles.length; i++) {
+					StyleRange style = styles[i];
+					if (style.data != null) {
+						Image image = (Image)style.data;
+						if (image != null) image.dispose();
+					}
+				}
+			}
+		});
+		
 		control = new Composite(parent, SWT.BORDER);
 		control.setLayout(new FillLayout());
 		viewer = new ControlImage(control, SWT.NONE);
@@ -91,6 +140,10 @@ public class ContainedControl implements IAdaptable {
         listeners.add(listener);
     }
     
+    public Rectangle getBounds() {
+    	return viewer.getDrawingBounds();
+    }
+    
 	private void disposeImage() {
 		
 		if (image == null) return;
@@ -112,7 +165,7 @@ public class ContainedControl implements IAdaptable {
         Point sel = styledText.getSelectionRange();
         return new Position(sel.x, sel.y);
     }
-    
+
     public boolean setFocus() {
         return control.setFocus();
     }
@@ -121,6 +174,10 @@ public class ContainedControl implements IAdaptable {
         if (listeners != null) {
             listeners.remove(listener);
         }
+    }
+    
+    public Image getImage() {
+    	return image;
     }
     
 }

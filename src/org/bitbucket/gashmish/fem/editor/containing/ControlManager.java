@@ -91,11 +91,7 @@ import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.text.undo.DocumentUndoEvent;
-import org.eclipse.text.undo.DocumentUndoManager;
-import org.eclipse.text.undo.IDocumentUndoListener;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
@@ -485,8 +481,8 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		ContainedControl contained = new ContainedControl();
 
 		contained.createControl(fStyledText, fContainingEditor);
-		contained.initializeControlContents(fContainingEditor, "/media/sid/test.bmp");
-
+		contained.initializeControlContents(fContainingEditor, "/tmp/test.jpg");
+		
 		// determine the location of the contained editor
 		Position projected = modelToProjected(new Position(offset, 0));
 		Point location = fStyledText.getLocationAtOffset(projected.offset);
@@ -495,7 +491,6 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		contained.setLocation(location);
 
 		return contained;
-
 	}
 
 	/**
@@ -510,32 +505,21 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		int length = p.length;
 
 		Rectangle rect = c.getControl().getBounds();
-		rect.height = 100;
-		rect.width = 100;
-		int ascent = rect.height - 4;
-		int descent = 4;
-
-		// use two style ranges
-
-		// first style range covers the entire size of the contained editor
+		rect = c.getBounds();
+		
+		// Use one style range
 		StyleRange first = new StyleRange();
-		first.borderColor = this.fContainingEditor.colorManager.getColor(new RGB(255, 0, 0));
 		first.start = offset;
 		first.length = Math.min(1, length);
-		first.background = this.fContainingEditor.colorManager
-				.getColor(new RGB(255, 0, 255));
-		//first.metrics = new GlyphMetrics(ascent + ContainingControl.MARGIN,descent + ContainingControl.MARGIN, rect.width + 2*ContainingControl.MARGIN);
-		first.metrics = new GlyphMetrics(100, 150, 150);
-		// this style range is hidden. the height and width are 0
-		StyleRange second = new StyleRange();
+		first.data = c.getImage();
+		first.metrics = new GlyphMetrics(rect.height, 0, rect.width);
+		
+        StyleRange second = new StyleRange();
 		second.start = offset + 1;
-		second.borderColor = this.fContainingEditor.colorManager.getColor(new RGB(255, 0, 0));
 		second.length = length - 1;
-		second.background = this.fContainingEditor.colorManager
-				.getColor(new RGB(255, 255, 255));
-		second.metrics = new GlyphMetrics(0, 0, 0);
-		second.font = TINY_FONT;
-
+		second.data = c.getImage();
+		second.metrics = new GlyphMetrics(rect.height, 0, rect.width);
+		
 		return new StyleRange[] { first, second };
 	}
 

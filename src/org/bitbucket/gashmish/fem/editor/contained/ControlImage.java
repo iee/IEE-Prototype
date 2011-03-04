@@ -54,7 +54,7 @@ public class ControlImage extends Canvas {
 		gc.drawImage(image, 0, 0, imageBounds.width, imageBounds.height, drawingBounds.x, drawingBounds.y, drawingBounds.width, drawingBounds.height);
 	}
 	
-	private Rectangle getDrawingBounds() {
+	public Rectangle getDrawingBounds() {
 		Rectangle imageBounds = image.getBounds();
 		Rectangle canvasBounds = getBounds();
 		
