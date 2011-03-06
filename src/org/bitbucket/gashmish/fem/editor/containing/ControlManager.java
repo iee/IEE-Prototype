@@ -287,7 +287,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 	 * generates the controls for the contained editors where they are supposed
 	 * to be located.
 	 */
-	boolean generateControls() {
+	public boolean generateControls() {
 		return generateControls(0, fDoc.getLength());
 	}
 
@@ -517,7 +517,7 @@ public class ControlManager implements IPainter, ITextPresentationListener,
         StyleRange second = new StyleRange();
 		second.start = offset + 1;
 		second.length = length - 1;
-		second.data = c.getImage();
+//		second.data = c.getImage();
 		second.metrics = new GlyphMetrics(rect.height, 0, rect.width);
 		
 		return new StyleRange[] { first, second };

@@ -218,7 +218,7 @@ public class ContainingControl extends CompilationUnitEditor {
 	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
-		controlManager.generateControls();
+		// controlManager.generateControls();
 	}
 
 	@Override
@@ -410,4 +410,9 @@ public class ContainingControl extends CompilationUnitEditor {
             firePropertyChange(PROP_DIRTY);
         }
     }
+    
+    public ISourceViewer internalGetSourceViewer() {
+        return getSourceViewer();
+    }
+
 }

@@ -23,12 +23,12 @@ import org.eclipse.ui.IEditorPart;
 public class InsertImageActionDelegate implements IEditorActionDelegate {
 
 	private static final String embeddedRegionMarker = "/* <-- *//* --> */";
-	
+
 	private ContainingControl currentControl;
-	
+
 	public InsertImageActionDelegate() {
 		// TODO Auto-generated constructor stub
-		
+
 	}
 
 	@Override
@@ -36,9 +36,10 @@ public class InsertImageActionDelegate implements IEditorActionDelegate {
 		// TODO Auto-generated method stub
 		if (targetEditor instanceof ContainingControl) {
 			currentControl = (ContainingControl) targetEditor;
-        }
+		}
 	}
 
+	@SuppressWarnings("restriction")
 	@Override
 	public void run(IAction action) {
 		// TODO Auto-generated method stub
@@ -71,7 +72,7 @@ public class InsertImageActionDelegate implements IEditorActionDelegate {
                 singlePres.addStyleRange(ranges[0]);
                 singlePres.addStyleRange(ranges[1]);
                 
-                //currentControl.internalGetSourceViewer().changeTextPresentation(singlePres, true);
+                currentControl.internalGetSourceViewer().changeTextPresentation(singlePres, true);
                 
                 // Focus on the new editor
                 ContainedControl containedEditor = 
