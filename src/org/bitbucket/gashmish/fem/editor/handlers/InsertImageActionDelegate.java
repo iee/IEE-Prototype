@@ -1,5 +1,10 @@
 package org.bitbucket.gashmish.fem.editor.handlers;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 import javax.swing.text.BadLocationException;
 
 import org.bitbucket.gashmish.fem.editor.contained.ContainedControl;
@@ -14,8 +19,10 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.GlyphMetrics;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
@@ -44,47 +51,66 @@ public class InsertImageActionDelegate implements IEditorActionDelegate {
 	public void run(IAction action) {
 		// TODO Auto-generated method stub
 		if (currentControl == null) {
-            Shell[] shells = Display.getCurrent().getShells();
-            Shell shell = null;
-            if (shells.length > 0) {
-                shell = shells[0];
-            }
-            MessageDialog.openError(shell, "Invalid editor", 
-                    "Cannot embedded CAL editors in this Java editor.\n" +
-                    "Close this editor, and re-open as an embeddable editor.");
-            return;
-        }
-        ISelectionProvider provider = currentControl.getSelectionProvider();
-        IDocument doc = currentControl.getContainingViewer().getDocument();
-        if (doc != null && provider != null && provider.getSelection() instanceof TextSelection) {
-            //try {
-                TextSelection sel = (TextSelection) provider.getSelection();
-                try {
-					doc.replace(sel.getOffset(), sel.getLength(), embeddedRegionMarker);
-				} catch (org.eclipse.jface.text.BadLocationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-                
-                ControlManager cm = currentControl.getControlManager();
-                StyleRange[] ranges = cm.createAndAddControl(sel.getOffset(), embeddedRegionMarker.length());
-                TextPresentation singlePres = new TextPresentation();
-                singlePres.addStyleRange(ranges[0]);
-                singlePres.addStyleRange(ranges[1]);
-                
-                currentControl.internalGetSourceViewer().changeTextPresentation(singlePres, true);
-                
-                // Focus on the new editor
-                ContainedControl containedEditor = 
-                    cm.findEditorProjected(ranges[0].start, ranges[0].length, true);
-                if (containedEditor != null) {
-                    containedEditor.setFocus();
-                }
-                
-            //} catch (BadLocationException e) {
-            //    System.out.print("wrong");
-            //}
-        }
+			Shell[] shells = Display.getCurrent().getShells();
+			Shell shell = null;
+			if (shells.length > 0) {
+				shell = shells[0];
+			}
+			MessageDialog
+					.openError(
+							shell,
+							"Invalid editor",
+							"Cannot embedded CAL editors in this Java editor.\n"
+									+ "Close this editor, and re-open as an embeddable editor.");
+			return;
+		}
+		ISelectionProvider provider = currentControl.getSelectionProvider();
+		IDocument doc = currentControl.getContainingViewer().getDocument();
+		if (doc != null && provider != null
+				&& provider.getSelection() instanceof TextSelection) {
+			// try {
+			TextSelection sel = (TextSelection) provider.getSelection();
+			try {
+				doc.replace(sel.getOffset(), sel.getLength(),
+						embeddedRegionMarker);
+			} catch (org.eclipse.jface.text.BadLocationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			ControlManager cm = currentControl.getControlManager();
+
+			InputStream in = null;
+			try {
+				in = new BufferedInputStream(new FileInputStream("/tmp/test.jpg"));
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Image newImage = new Image(Display.getDefault(), in);
+
+			cm.addImage(newImage, sel.getOffset(), embeddedRegionMarker.length());
+
+			// StyleRange[] ranges = cm.createAndAddControl(sel.getOffset(),
+			// embeddedRegionMarker.length());
+			// TextPresentation singlePres = new TextPresentation();
+			// singlePres.addStyleRange(ranges[0]);
+			// singlePres.addStyleRange(ranges[1]);
+
+			// currentControl.internalGetSourceViewer().changeTextPresentation(singlePres,
+			// true);
+
+			// Focus on the new editor
+			// ContainedControl containedEditor =
+			// cm.findEditorProjected(ranges[0].start, ranges[0].length, true);
+			// if (containedEditor != null) {
+			// containedEditor.setFocus();
+			// }
+
+			// } catch (BadLocationException e) {
+			// System.out.print("wrong");
+			// }
+		}
 
 	}
 

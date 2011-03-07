@@ -88,6 +88,7 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GlyphMetrics;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -272,6 +273,16 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		}
 	}
 
+	public void addImage(Image image, int offset, int length) {
+		StyleRange style = new StyleRange ();
+		style.start = offset;
+		style.length = length;
+		style.data = image;
+		Rectangle rect = image.getBounds();
+		style.metrics = new GlyphMetrics(rect.height, 0, rect.width);
+		fStyledText.setStyleRange(style);		
+	}
+	
 	/**
 	 * Extended so that we use our own position manager, not the one that is
 	 * passed in.
@@ -912,6 +923,9 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		StyledText containedStyledText = (StyledText) editor
 				.getAdapter(StyledText.class);
 
+		if (containedStyledText == null)
+			return;
+		
 		// this progression determines the location of the offset in the
 		// coordinate system
 		// of the containing styledText

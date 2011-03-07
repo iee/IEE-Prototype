@@ -81,52 +81,7 @@ public class ContainedControl implements IAdaptable {
 
 	public void createControl(final StyledText parent,
 			ContainingControl containingEditor) {
-		// use a verify listener to dispose the images
-		parent.addVerifyListener(new VerifyListener() {
-			public void verifyText(VerifyEvent event) {
-				if (event.start == event.end)
-					return;
-				String text = parent.getText(event.start, event.end - 1);
-				int index = text.indexOf('\uFFFC');
-				while (index != -1) {
-					StyleRange style = parent.getStyleRangeAtOffset(event.start
-							+ index);
-					if (style != null) {
-						Image image = (Image) style.data;
-						if (image != null)
-							image.dispose();
-					}
-					index = text.indexOf('\uFFFC', index + 1);
-				}
-			}
-		});
-		// draw images on paint event
-		parent.addPaintObjectListener(new PaintObjectListener() {
-			public void paintObject(PaintObjectEvent event) {
-				StyleRange style = event.style;
-				if (style == null)
-					return;
-				Image image = (Image) style.data;
-				if (!image.isDisposed()) {
-					int x = event.x;
-					int y = event.y + event.ascent - style.metrics.ascent;
-					event.gc.drawImage(image, x, y);
-				}
-			}
-		});
-		parent.addListener(SWT.Dispose, new Listener() {
-			public void handleEvent(Event event) {
-				StyleRange[] styles = parent.getStyleRanges();
-				for (int i = 0; i < styles.length; i++) {
-					StyleRange style = styles[i];
-					if (style.data != null) {
-						Image image = (Image) style.data;
-						if (image != null)
-							image.dispose();
-					}
-				}
-			}
-		});
+		styledText = parent;
 
 		control = new Composite(parent, SWT.BORDER);
 		control.setLayout(new FillLayout());

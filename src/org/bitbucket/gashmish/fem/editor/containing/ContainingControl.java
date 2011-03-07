@@ -24,11 +24,13 @@ import org.eclipse.jface.text.IWidgetTokenKeeper;
 import org.eclipse.jface.text.PaintManager;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextEvent;
+import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.FormattingContextProperties;
 import org.eclipse.jface.text.formatter.IFormattingContext;
+import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
@@ -37,11 +39,15 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.PaintObjectEvent;
+import org.eclipse.swt.custom.PaintObjectListener;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -269,15 +275,67 @@ public class ContainingControl extends CompilationUnitEditor {
 		styledText = viewer.getTextWidget();
 
         // ensure that text can't be typed in the embedded editor
-        styledText.addVerifyListener(new VerifyListener() {
-            public void verifyText(VerifyEvent e) {
-                if (controlManager.isPositionBehindEditor(e.start, e.end-e.start)) {
-                    // actually, should bring up a dialog box that
-                    // will ask if should be deleted
-                    e.doit = false;
-                }
-            }
-        });
+//        styledText.addVerifyListener(new VerifyListener() {
+//            public void verifyText(VerifyEvent e) {
+//                if (controlManager.isPositionBehindEditor(e.start, e.end-e.start)) {
+//                    // actually, should bring up a dialog box that
+//                    // will ask if should be deleted
+//                    e.doit = false;
+//                }
+//            }
+//        });
+        
+		// use a verify listener to dispose the images
+		styledText.addVerifyListener(new VerifyListener() {
+			public void verifyText(VerifyEvent event) {
+				if (event.start == event.end)
+					return;
+				
+				String text = styledText.getText(event.start, event.end - 1);
+				int index = text.indexOf("/* <-- *//* --> */");
+				while (index != -1) {
+					StyleRange style = styledText.getStyleRangeAtOffset(event.start
+							+ index);
+					if (style != null) {
+						Image image = (Image) style.data;
+						if (image != null)
+							image.dispose();
+					}
+					index = text.indexOf("/* <-- *//* --> */", index + 1);
+				}
+			}
+		});
+		// draw images on paint event
+		styledText.addPaintObjectListener(new PaintObjectListener() {
+			public void paintObject(PaintObjectEvent event) {
+				StyleRange style = event.style;
+				if (style == null)
+					return;
+				Image image = (Image) style.data;
+				if (image == null)
+					return;
+				if (!image.isDisposed()) {
+					int x = event.x;
+					int y = event.y + event.ascent - style.metrics.ascent;
+					event.gc.drawImage(image, x, y);
+				}
+			}
+		});
+		
+		styledText.addListener(SWT.Dispose, new Listener() {
+			public void handleEvent(Event event) {
+				StyleRange[] styles = styledText.getStyleRanges();
+				for (int i = 0; i < styles.length; i++) {
+					StyleRange style = styles[i];
+					if (style.data != null) {
+						Image image = (Image) style.data;
+						if (image != null)
+							image.dispose();
+					}
+				}
+			}
+		});
+		
 		// Whenever selection is completely behind an embedded editor,
 		// give focus to the editor
 		final ISelectionProvider provider = viewer.getSelectionProvider();
@@ -330,37 +388,37 @@ public class ContainingControl extends CompilationUnitEditor {
 		// does
 
 		controlManager = new ControlManager(this, styledText, doc);
-		controlManager.installPartitioner(viewer);
+		// controlManager.installPartitioner(viewer);
 
 		// redraw the embedded editors whenever there is a repaint
-		viewer.addTextListener(new ITextListener() {
-			public void textChanged(TextEvent event) {
-				// ensure that this is a valid text change
-				// if (event.getReplacedText() != null || event.getLength() !=
-				// event.getText().length()) {
-				if (event.getDocumentEvent() != null) {
-					DocumentEvent de = event.getDocumentEvent();
-
-					// try {
-					// // do the full line
-					// IRegion start =
-					// doc.getLineInformationOfOffset(event.getOffset());
-					// IRegion end =
-					// doc.getLineInformationOfOffset(event.getOffset() +
-					// event.getLength());
-					// controlManager.generateControls(start.getOffset(),
-					// start.getLength());
-
-					controlManager.generateControls(de.fOffset, de.getText()
-							.length());
-					controlManager.paint(IPainter.TEXT_CHANGE);
-					// } catch (BadLocationException e) {
-					// EmbeddedCALPlugin.logError("Error generating controls after text changed",
-					// e);
-					// }
-				}
-			}
-		});
+//		viewer.addTextListener(new ITextListener() {
+//			public void textChanged(TextEvent event) {
+//				// ensure that this is a valid text change
+//				// if (event.getReplacedText() != null || event.getLength() !=
+//				// event.getText().length()) {
+//				if (event.getDocumentEvent() != null) {
+//					DocumentEvent de = event.getDocumentEvent();
+//
+//					// try {
+//					// // do the full line
+//					// IRegion start =
+//					// doc.getLineInformationOfOffset(event.getOffset());
+//					// IRegion end =
+//					// doc.getLineInformationOfOffset(event.getOffset() +
+//					// event.getLength());
+//					// controlManager.generateControls(start.getOffset(),
+//					// start.getLength());
+//
+////					controlManager.generateControls(de.fOffset, de.getText()
+////							.length());
+//					controlManager.paint(IPainter.TEXT_CHANGE);
+//					// } catch (BadLocationException e) {
+//					// EmbeddedCALPlugin.logError("Error generating controls after text changed",
+//					// e);
+//					// }
+//				}
+//			}
+//		});
 
 		return viewer;
 	}
