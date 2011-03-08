@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
+import org.bitbucket.gashmish.fem.editor.Activator;
 import org.bitbucket.gashmish.fem.editor.containing.ContainingControl;
 import org.bitbucket.gashmish.fem.editor.containing.ControlManager;
 import org.eclipse.jface.action.IAction;
@@ -40,7 +41,7 @@ public class EvaluateLineActionDelegate implements IEditorActionDelegate {
 	private static final String embeddedRegionMarker = "@image ";
 	private static final String evaluateMarker = "@eval ";
 	/* XXX: Rewrite it, all images need cached */
-	private final String defaultImageName = "/tmp/test.jpeg";
+	private String pathToImage = Activator.pluginLocation.append("test.jpeg").toString();
 	
 	public EvaluateLineActionDelegate() {
 		// TODO Auto-generated constructor stub
@@ -95,7 +96,7 @@ public class EvaluateLineActionDelegate implements IEditorActionDelegate {
 					
 					TeXFormula formula = new TeXFormula(stw.toString());
 					/* */
-					formula.createJPEG(TeXConstants.STYLE_DISPLAY, FONT_SIZE_TEX, defaultImageName, Color.white, Color.black);
+					formula.createJPEG(TeXConstants.STYLE_DISPLAY, FONT_SIZE_TEX, pathToImage, Color.white, Color.black);
 				}
 				
 				
@@ -130,7 +131,7 @@ public class EvaluateLineActionDelegate implements IEditorActionDelegate {
 					ControlManager cm = currentControl.getControlManager();
 	
 					InputStream in = null;
-					in = new BufferedInputStream(new FileInputStream(defaultImageName));
+					in = new BufferedInputStream(new FileInputStream(pathToImage));
 					Image newImage = new Image(Display.getDefault(), in);
 	
 					cm.addImage(newImage, sel.getOffset(), embeddedRegionMarker.length());
