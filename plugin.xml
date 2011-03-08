@@ -20,11 +20,11 @@
             id="org.bitbucket.gashmish.fem.editor.containing.insertimage"
             targetID="#CompilationUnitEditorContext">
          <action
-               class="org.bitbucket.gashmish.fem.editor.handlers.InsertImageActionDelegate"
-               id="org.bitbucket.gashmish.fem.editor.containing.insertimage.action"
-               label="Insert image"
+               class="org.bitbucket.gashmish.fem.editor.handlers.EvaluateLineActionDelegate"
+               id="org.bitbucket.gashmish.fem.editor.containing.evaluateline.action"
+               label="Evaluate Line"
                menubarPath="additions"
-               tooltip="Insert any image">
+               tooltip="Evaluate expression on line">
          </action>
       </viewerContribution>
    </extension>

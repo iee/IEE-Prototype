@@ -324,15 +324,16 @@ public class ContainingControl extends CompilationUnitEditor {
 		
 		styledText.addListener(SWT.Dispose, new Listener() {
 			public void handleEvent(Event event) {
-				StyleRange[] styles = styledText.getStyleRanges();
-				for (int i = 0; i < styles.length; i++) {
-					StyleRange style = styles[i];
-					if (style.data != null) {
-						Image image = (Image) style.data;
-						if (image != null)
-							image.dispose();
-					}
-				}
+				/* XXX: This listener generate call trace */
+//				StyleRange[] styles = styledText.getStyleRanges();
+//				for (int i = 0; i < styles.length; i++) {
+//					StyleRange style = styles[i];
+//					if (style.data != null) {
+//						Image image = (Image) style.data;
+//						if (image != null)
+//							image.dispose();
+//					}
+//				}
 			}
 		});
 		
