@@ -37,7 +37,8 @@ public class EvaluateLineActionDelegate implements IEditorActionDelegate {
 
 	private ContainingControl currentControl;
 	int FONT_SIZE_TEX = 20;
-	private static final String embeddedRegionMarker = "image:";
+	private static final String embeddedRegionMarker = "@image ";
+	private static final String evaluateMarker = "@eval ";
 	/* XXX: Rewrite it, all images need cached */
 	private final String defaultImageName = "/tmp/test.jpeg";
 	
@@ -68,12 +69,12 @@ public class EvaluateLineActionDelegate implements IEditorActionDelegate {
 				expression = doc.get(lineInfo.getOffset(), lineInfo.getLength());
 				
 				/* Check this expression */
-				int eval = expression.indexOf("Eval:");
+				int eval = expression.indexOf(evaluateMarker);
 				
 				String output = "";
 				if (eval != -1) {
 					/* Evaluate this expression */
-					String realExpression = expression.substring(eval + 5, lineInfo.getLength());
+					String realExpression = expression.substring(eval + evaluateMarker.length(), lineInfo.getLength());
 			
 				    F.initSymbols(null);
 				    EvalUtilities util = new EvalUtilities();
