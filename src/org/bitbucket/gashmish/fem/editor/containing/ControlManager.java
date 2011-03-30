@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2011 EditorDesignFEM 
  * Copyright (c) 2007 BUSINESS OBJECTS SOFTWARE LIMITED
  * All rights reserved.
  * 
@@ -503,7 +504,25 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 
 		return contained;
 	}
+	/*
+	 * Adds a control at the given position
+	 */
+	private ContainedControl addControl(int offset, int length, String path) {
+		
+		ContainedControl contained = new ContainedControl();
+		//fStyledText.replaceTextRange(fStyledText.getCaretOffset(), 0, "\uFFFC");
+		contained.createControl(fStyledText, fContainingEditor);
+		
+		contained.initializeControlContents(fContainingEditor, path);
+		// determine the location of the contained editor
+		Position projected = modelToProjected(new Position(offset, 0));
+		Point location = fStyledText.getLocationAtOffset(projected.offset);
+		location.x += ContainingControl.MARGIN;
+		location.y += ContainingControl.MARGIN;
+		contained.setLocation(location);
 
+		return contained;
+	}
 	/**
 	 * creates the style range of the StyledText for the range of the contained
 	 * editor
@@ -563,7 +582,35 @@ public class ControlManager implements IPainter, ITextPresentationListener,
 		}
 		return styles;
 	}
+	/**
+	 * Creates and adds a single control at the given position
+	 * 
+	 * @param offset
+	 * @param length
+	 * @return pair of style ranges that covers this embedded editor
+	 */
+	public StyleRange[] createAndAddControl(int offset, int length, String path) {
+		StyleRange[] styles = null;
+		Position pos = new Position(offset, length);
+		if (!fContainedControlPositionMap.containsValue(pos)) {
+			ContainedControl newContainedEditor = addControl(offset, length, path);
+			newContainedEditor.addListener(this);
+			styles = createStyleRange(newContainedEditor, pos);
+			// newContainedEditor.registerActions(fContainingEditor);
+			fContainedControlPositionMap.put(newContainedEditor, pos);
+			// ppManager.managePosition(pos);
 
+		} else {
+			for (final ContainedControl c : fContainedControlPositionMap
+					.keySet()) {
+				if (fContainedControlPositionMap.get(c).equals(pos)) {
+					styles = createStyleRange(c, pos);
+					break;
+				}
+			}
+		}
+		return styles;
+	}
 	/**
 	 * Checks to see if a projected position is behind an embedded editor
 	 * 

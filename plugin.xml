@@ -17,7 +17,7 @@
    <extension
          point="org.eclipse.ui.popupMenus">
       <viewerContribution
-            id="org.bitbucket.gashmish.fem.editor.containing.insertimage"
+            id="org.bitbucket.gashmish.fem.editor.containing.evaluateline"
             targetID="#CompilationUnitEditorContext">
          <action
                class="org.bitbucket.gashmish.fem.editor.handlers.EvaluateLineActionDelegate"
@@ -25,6 +25,17 @@
                label="Evaluate Line"
                menubarPath="additions"
                tooltip="Evaluate expression on line">
+         </action>
+      </viewerContribution>
+      <viewerContribution
+            id="org.bitbucket.gashmish.fem.editor.containing.insertimage"
+            targetID="#CompilationUnitEditorContext">
+         <action
+               class="org.bitbucket.gashmish.fem.editor.handlers.InsertImageActionDelegate"
+               id="org.bitbucket.gashmish.fem.editor.containing.insertimage.action"
+               label="Insert image"
+               menubarPath="additions"
+               tooltip="Insert any image">
          </action>
       </viewerContribution>
    </extension>
